@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Link from "next/link";
 import Image from "next/image";
 
 import { SignIn, SignInButton, SignOutButton, useUser } from "@clerk/clerk-react";
@@ -43,7 +42,7 @@ const PostView = (props: PostWithUser) => {
           
           <span className="ml-2 text-slate-500">
           {`· ${dayjs(post.createdAt).fromNow()}`}
-          
+
           </span>
         </div>
         <span className="">
