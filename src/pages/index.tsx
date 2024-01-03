@@ -1,12 +1,14 @@
 import Head from "next/head";
 import Image from "next/image";
 
+
 import { SignIn, SignInButton, SignOutButton, useUser } from "@clerk/clerk-react";
 import { api } from "~/utils/api";
 import { RouterOutputs } from "~/utils/api";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { LoadingSpinner, LoadingPage } from "~/components/loading";
 dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
@@ -55,16 +57,35 @@ const PostView = (props: PostWithUser) => {
 
 
 
+const Feed = () => {
+  const {data, isLoading: postsLoading} = api.posts.getAll.useQuery();
+  
+  if (postsLoading) return <LoadingPage/>
+
+  if (!data) return <div>Something went wrong</div>
+
+  return (
+    <div className="flex flex-col">
+      {[...data, ...data]?.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id}/>
+      ))}
+    </div>
+  )
+}
+
+
+
 
 export default function Home() {
 
-  const user = useUser();
+  const {isLoaded: userLoaded, isSignedIn} = useUser();
 
-  const {data, isLoading} = api.posts.getAll.useQuery();
+  api.posts.getAll.useQuery();
 
-  if (isLoading) return (<div>Loading...</div>);
+  // Return empdy div if user is not loaded
+  if (!userLoaded) return (<div/>);
 
-  if (!data) return (<div>No data</div>); 
+
 
   return (
     <>
@@ -79,20 +100,17 @@ export default function Home() {
           <div className ="flex border-b border-slate-400 p-4">
 
             
-            {!user.isSignedIn && ( 
+            {!isSignedIn && ( 
             <div className="flex justify-center">
               <SignInButton />
             </div>
             )}
-            {user.isSignedIn && <CreatePostWizard/>}
+            {isSignedIn && <CreatePostWizard/>}
             
           </div>
 
-          <div className="flex flex-col">
-            {[...data, ...data]?.map((fullPost) => (
-              <PostView {...fullPost} key={fullPost.post.id}/>
-            ))}
-          </div>
+          <Feed/>
+          
 
         </div>
 
