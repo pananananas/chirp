@@ -1,8 +1,8 @@
 import Head from "next/head";
 import Image from "next/image";
 
-
-import { SignIn, SignInButton, SignOutButton, useUser } from "@clerk/clerk-react";
+//removed:  SignIn, SignOutButton,
+import { SignInButton, useUser } from "@clerk/clerk-react";
 import { api } from "~/utils/api";
 import { RouterOutputs } from "~/utils/api";
 
