@@ -13,6 +13,16 @@ const filterUserForClient = (user: User) => {
     }
 }
 
+import {Ratelimit} from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+
+// Create a new ratelimiter, that allows 3 requests per minute
+const ratelimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(3, "1 m"),
+    analytics: true,
+});
+
 
 export const postsRouter = createTRPCRouter({
 
@@ -54,6 +64,11 @@ export const postsRouter = createTRPCRouter({
     )
     .mutation(async ({ctx, input}) => {
     const authorId = ctx.userId;
+
+    const {success} = await ratelimit.limit(authorId)
+
+    if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "You are doing that too much" });
+    
 
     const post = await ctx.db.post.create({
         data: {
