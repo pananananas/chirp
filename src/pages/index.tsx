@@ -43,6 +43,7 @@ const PostView = (props: PostWithUser) => {
           
           <span className="ml-2 text-slate-500">
           {`· ${dayjs(post.createdAt).fromNow()}`}
+          
           </span>
         </div>
         <span className="">
